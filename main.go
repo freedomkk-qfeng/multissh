@@ -6,7 +6,6 @@ import (
 	"log"
 	"strings"
 	"time"
-
 	//	"github.com/bitly/go-simplejson"
 )
 
@@ -78,20 +77,25 @@ func main() {
 			host_struct.cmd = cmdlist
 			sshhosts = append(sshhosts, host_struct)
 		}
-	} else {
-		cfgjson, err := GetfileAll(*cfg)
-		if err != nil {
-			log.Println("load cfg error: ", err)
-			return
-		}
-		js, js_err := simplejson.NewJson(cfgjson)
-		if js_err != nil {
-			log.Println("json format error: ", js_err)
-			return
-		}
-
 	}
-	fmt.Println(sshhosts)
+	/*
+		 else {
+			cfgjson, err := GetfileAll(*cfg)
+			if err != nil {
+				log.Println("load cfg error: ", err)
+				return
+			}
+
+				js, js_err := simplejson.NewJson(cfgjson)
+				if js_err != nil {
+					log.Println("json format error: ", js_err)
+					return
+				}
+
+
+		}
+	*/
+	//fmt.Println(sshhosts)
 
 	chs := make([]chan string, len(sshhosts))
 	for i, host := range sshhosts {
