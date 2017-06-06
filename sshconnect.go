@@ -25,7 +25,7 @@ func connect(user, password, host string, port int) (*ssh.Session, error) {
 	auth = append(auth, ssh.Password(password))
 
 	config = ssh.Config{
-		Ciphers: []string{"aes128-cbc", "3des-cbc", "aes192-cbc", "aes256-cbc"},
+		Ciphers: []string{"aes128-cbc", "3des-cbc", "aes196-cbc", "aes256-cbc", "twofish256-cbc", "twofish-cbc", "twofish128-cbc", "blowfish-cbc"},
 	}
 
 	clientConfig = &ssh.ClientConfig{
@@ -68,8 +68,7 @@ func dossh(username, password, ip string, cmdlist []string, port int, ch chan st
 	var bt bytes.Buffer
 	session.Stdout = &bt
 
-	//	session.Stderr = os.Stderr
-	//	session.Stdin = os.Stdin
+	session.Stderr = &bt
 	err = session.Shell()
 	for _, c := range cmdlist {
 		c = c + "\n"
