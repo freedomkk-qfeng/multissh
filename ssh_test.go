@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	username = "admin"
-	password = "123"
-	ip       = "10.10.31.50"
+	username = ""
+	password = ""
+	ip       = ""
 	port     = 22
-	cmd      = "show clock\n"
+	cmd      = "date\n"
 )
 
 func Test_SSH(t *testing.T) {

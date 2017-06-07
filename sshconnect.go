@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"time"
-
 	"net"
+	//"os"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -25,7 +25,7 @@ func connect(user, password, host string, port int) (*ssh.Session, error) {
 	auth = append(auth, ssh.Password(password))
 
 	config = ssh.Config{
-		Ciphers: []string{"aes128-cbc", "3des-cbc", "aes192-cbc", "aes256-cbc"},
+		Ciphers: []string{"aes128-ctr", "aes192-ctr", "aes256-ctr", "arcfour256", "arcfour128", "aes128-cbc", "3des-cbc", "blowfish-cbc", "cast128-cbc", "aes192-cbc", "aes256-cbc", "arcfour"},
 	}
 
 	clientConfig = &ssh.ClientConfig{
@@ -55,28 +55,30 @@ func connect(user, password, host string, port int) (*ssh.Session, error) {
 
 func dossh(username, password, ip string, cmdlist []string, port int, ch chan string) {
 	session, err := connect(username, password, ip, port)
+
 	if err != nil {
 		ch <- fmt.Sprintf("<%s>", err.Error())
 		return
+
 	}
 	defer session.Close()
 
 	//	cmd := "ls;date;exit"
-
 	stdinBuf, _ := session.StdinPipe()
+	//fmt.Fprintf(os.Stdout, "%s", stdinBuf)
+	var outbt, errbt bytes.Buffer
+	session.Stdout = &outbt
 
-	var bt bytes.Buffer
-	session.Stdout = &bt
-
-	//	session.Stderr = os.Stderr
-	//	session.Stdin = os.Stdin
+	session.Stderr = &errbt
 	err = session.Shell()
 	for _, c := range cmdlist {
 		c = c + "\n"
 		stdinBuf.Write([]byte(c))
+
 	}
 	session.Wait()
-	ch <- bt.String()
+	ch <- (outbt.String() + errbt.String())
+
 	return
 
 }
