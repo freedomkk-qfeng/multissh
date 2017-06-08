@@ -58,6 +58,7 @@ func dossh(username, password, ip string, cmdlist []string, port int, ch chan st
 
 	if err != nil {
 		ch <- fmt.Sprintf("<%s>", err.Error())
+		//<-chLimit
 		return
 
 	}
@@ -78,7 +79,7 @@ func dossh(username, password, ip string, cmdlist []string, port int, ch chan st
 	}
 	session.Wait()
 	ch <- (outbt.String() + errbt.String())
-
+	//<-chLimit
 	return
 
 }

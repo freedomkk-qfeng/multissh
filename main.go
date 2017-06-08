@@ -37,6 +37,7 @@ func main() {
 	jsonFile := flag.String("j", "ssh.json", "Json File Path")
 	outTxt := flag.Bool("outTxt", false, "write result into txt")
 	timeLimit := flag.Duration("t", 30, "max timeout")
+	numLimit := flag.Int("n", 20, "max execute number")
 
 	flag.Parse()
 	var cmdList []string
@@ -139,12 +140,16 @@ func main() {
 		}
 	*/
 	//fmt.Println(sshhosts)
-
+	chLimit := make(chan bool, numLimit)
 	chs := make([]chan string, len(sshHosts))
+	limitFunc := func(chLimit chan bool, ch chan string, host SSHHost) {
+		dossh(host.Username, host.Password, host.Host, host.Cmd, host.Port, ch)
+		<-chLimit
+	}
 	for i, host := range sshHosts {
 		chs[i] = make(chan string, 1)
-
-		go dossh(host.Username, host.Password, host.Host, host.Cmd, host.Port, chs[i])
+		chLimit <- true
+		go limitFunc(chLimit, chs[i], host)
 	}
 	for i, ch := range chs {
 		fmt.Println(sshHosts[i].Host, " ssh start")
@@ -158,6 +163,7 @@ func main() {
 			log.Println("SSH run timeout")
 			sshHosts[i].Result += ("SSH run timeout：" + strconv.Itoa(int(*timeLimit)) + "second.")
 		}
+		fmt.Println(sshHosts[i].Host, " ssh end")
 	}
 
 	//gu
@@ -170,4 +176,5 @@ func main() {
 			}
 		}
 	}
+
 }
